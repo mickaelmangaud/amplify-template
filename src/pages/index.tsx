@@ -1,3 +1,7 @@
+import { useAuth } from '../context/authContext';
+
 export default function Home() {
-  return <h1>Next Template</h1>;
+  const { login } = useAuth();
+
+  return <h1 onClick={() => login('mickael', 'blop')}>Next Template</h1>;
 }
