@@ -1,4 +1,5 @@
 import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
+import { Auth, Hub } from 'aws-amplify';
 
 interface IAuht {
   isAuthenticated: boolean;
@@ -9,7 +10,9 @@ interface IAuht {
 interface IAuthContext {
   auth: IAuht;
   register?(email: string, password: string): Promise<void>;
+  confirmSignup?(username: string, code: string): Promise<void>;
   login?(email: string, password: string): Promise<void>;
+  loginWithGoogle?(): Promise<void>;
   logout?(): Promise<void>;
 }
 
@@ -38,7 +41,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
   useEffect(() => {
     async function checkUser() {
       const auth = localStorage.getItem('auth');
-      auth && setAuth(JSON.parse(auth));
+      if (auth) {
+        setAuth(JSON.parse(auth));
+      }
     }
     checkUser();
     setIsInitialized(true);
@@ -51,19 +56,49 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
     }
   });
 
+  useEffect(() => {
+    Hub.listen('auth', user => {
+      console.log('USER', user);
+    });
+  }, []);
+
   async function register(email, password) {
     try {
-    } catch (e) {}
+      const res = await Auth.signUp({
+        username: email,
+        password,
+        attributes: { email },
+      });
+      console.log(res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function confirmSignup(username: string, code: string) {
+    try {
+      const res = await Auth.confirmSignUp(username, code);
+      console.log(res);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async function login(email, password) {
     try {
-      setAuth({
-        error: null,
-        isAuthenticated: true,
-        user: 'mickael',
-      });
-    } catch (e) {}
+      const user = await Auth.signIn(email, password);
+      console.log(auth);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function loginWithGoogle() {
+    try {
+      // await Auth.federatedSignIn({ provider: 'Google'});
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async function logout() {
@@ -75,7 +110,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
   }
 
   return (
-    <AuthContext.Provider value={{ auth, register, login, logout }}>
+    <AuthContext.Provider value={{ auth, register, login, logout, confirmSignup, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
