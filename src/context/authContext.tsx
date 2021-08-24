@@ -1,15 +1,20 @@
 import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
+import { CognitoUser } from '@aws-amplify/auth';
 
-interface IAuht {
-  isAuthenticated: boolean;
-  user: string | null;
-  error: string | null;
+// Fix (le type CognitoUser renvoie un truc bizarre)
+interface User extends CognitoUser {
+  attributes: {
+    sub: string;
+    email: string;
+    email_verified: string;
+  };
+  username: string;
 }
 
 interface IAuthContext {
-  auth: IAuht;
-  register?(email: string, password: string): Promise<void>;
+  user: User;
+  register?(username: string, email: string, password: string): Promise<void>;
   confirmSignup?(username: string, code: string): Promise<void>;
   login?(email: string, password: string): Promise<void>;
   loginWithGoogle?(): Promise<void>;
@@ -17,11 +22,7 @@ interface IAuthContext {
 }
 
 const initialState = {
-  auth: {
-    isAuthenticated: false,
-    user: null,
-    error: null,
-  },
+  user: null,
 };
 
 const AuthContext = createContext<IAuthContext>(initialState);
@@ -31,45 +32,29 @@ interface AuthContextProviderProps {
 }
 
 export function AuthContextProvider({ children }: AuthContextProviderProps): ReactElement {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [auth, setAuth] = useState({
-    isAuthenticated: false,
-    user: null,
-    error: null,
-  });
+  const [user, setUser] = useState<User>(null);
 
   useEffect(() => {
     async function checkUser() {
-      const auth = localStorage.getItem('auth');
+      const auth = await Auth.currentAuthenticatedUser();
       if (auth) {
-        setAuth(JSON.parse(auth));
+        setUser(auth);
       }
     }
     checkUser();
-    setIsInitialized(true);
   }, []);
 
-  /* Save store each time it changes, if already initialized */
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('auth', JSON.stringify(auth));
-    }
-  });
-
-  useEffect(() => {
-    Hub.listen('auth', user => {
-      console.log('USER', user);
+    Hub.listen('auth', hubCapsule => {
+      if (hubCapsule) {
+        setUser(hubCapsule.payload.data);
+      }
     });
   }, []);
 
-  async function register(email, password) {
+  async function register(username: string, email: string, password: string) {
     try {
-      const res = await Auth.signUp({
-        username: email,
-        password,
-        attributes: { email },
-      });
-      console.log(res);
+      await Auth.signUp({ username, password, attributes: { email } });
     } catch (e) {
       console.log(e);
     }
@@ -77,17 +62,15 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
 
   async function confirmSignup(username: string, code: string) {
     try {
-      const res = await Auth.confirmSignUp(username, code);
-      console.log(res);
+      await Auth.confirmSignUp(username, code);
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function login(email, password) {
+  async function login(email: string, password: string) {
     try {
-      const user = await Auth.signIn(email, password);
-      console.log(auth);
+      await Auth.signIn(email, password);
     } catch (e) {
       console.log(e);
     }
@@ -95,22 +78,28 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
 
   async function loginWithGoogle() {
     try {
-      // await Auth.federatedSignIn({ provider: 'Google'});
+      await Auth.federatedSignIn({ provider: 'Google' });
     } catch (e) {
       console.log(e);
     }
   }
 
   async function logout() {
-    setAuth({
-      error: null,
-      isAuthenticated: false,
-      user: null,
-    });
+    await Auth.signOut();
+    setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ auth, register, login, logout, confirmSignup, loginWithGoogle }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        register,
+        login,
+        logout,
+        confirmSignup,
+        loginWithGoogle,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

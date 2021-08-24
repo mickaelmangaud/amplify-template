@@ -47,7 +47,7 @@
     "@aws-amplify/api-graphql" "2.1.2"
     "@aws-amplify/api-rest" "2.0.10"
 
-"@aws-amplify/auth@4.3.0":
+"@aws-amplify/auth@4.3.0", "@aws-amplify/auth@^4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@aws-amplify/auth/-/auth-4.3.0.tgz#fe0eadfb240c2fd0fcf83fb391af1e1f90e705c5"
   integrity sha512-9z6m0HejbpZ1RyGhTPb/AkABsYfUg8aupKzXmKu1OtvxN24Yp09sv61lzEmB54XX1g+QPdci9xvA5yDiIaJp+g==

@@ -1,19 +1,17 @@
 import { useAuth } from '../context';
-import { Auth } from 'aws-amplify';
 
 export default function Home() {
-  const { login, auth, logout, register, confirmSignup, loginWithGoogle } = useAuth();
-  const getUser = async () => await Auth.currentAuthenticatedUser();
-  console.log('getUser', getUser());
+  const { login, user, logout, register, confirmSignup, loginWithGoogle } = useAuth();
+
   return (
     <div>
-      {auth.user ? <p>Vous etes connecté</p> : <p>Vous nêtes pas connecté</p>}
+      <h1>Bonjour {user?.username}</h1>
       <button onClick={() => login('mickaelmangaud@gmail.com', '55555wR*')}>Connexion</button>
       <button onClick={() => logout()}>Déconnexion</button>
-      <button onClick={() => register('mickaelmangaud@gmail.com', '55555wR*')}>Register</button>
-      <button onClick={() => confirmSignup('mickaelmangaud@gmail.com', '904016')}>
-        ConfirmSignup
+      <button onClick={() => register('mickael', 'mickaelmangaud@gmail.com', '55555wR*')}>
+        Register
       </button>
+      <button onClick={() => confirmSignup('mickael', '094428')}>ConfirmSignup</button>
       <button onClick={() => loginWithGoogle()}>Google</button>
     </div>
   );
