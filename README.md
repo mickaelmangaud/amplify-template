@@ -1,1 +1,1 @@
-# Next Template
+# Amplify template
