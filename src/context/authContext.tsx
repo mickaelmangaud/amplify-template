@@ -1,14 +1,8 @@
-import {
-  createContext,
-  useContext,
-  ReactElement,
-  useState,
-  useEffect,
-} from 'react';
+import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
 
 interface IAuht {
   isAuthenticated: boolean;
-  user: object | null;
+  user: string | null;
   error: string | null;
 }
 
@@ -19,20 +13,22 @@ interface IAuthContext {
   logout?(): Promise<void>;
 }
 
-const defaultValue = {
+const initialState = {
   auth: {
     isAuthenticated: false,
     user: null,
     error: null,
   },
-  register: null,
-  login: null,
-  logout: null,
 };
 
-const AuthContext = createContext<IAuthContext>(defaultValue);
+const AuthContext = createContext<IAuthContext>(initialState);
 
-export function AuthContextProvider({ children }): ReactElement {
+interface AuthContextProviderProps {
+  children: ReactElement;
+}
+
+export function AuthContextProvider({ children }: AuthContextProviderProps): ReactElement {
+  const [isInitialized, setIsInitialized] = useState(false);
   const [auth, setAuth] = useState({
     isAuthenticated: false,
     user: null,
@@ -40,19 +36,43 @@ export function AuthContextProvider({ children }): ReactElement {
   });
 
   useEffect(() => {
-    async function checkUser() {}
+    async function checkUser() {
+      const auth = localStorage.getItem('auth');
+      auth && setAuth(JSON.parse(auth));
+    }
     checkUser();
+    setIsInitialized(true);
   }, []);
+
+  /* Save store each time it changes, if already initialized */
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('auth', JSON.stringify(auth));
+    }
+  });
 
   async function register(email, password) {
     try {
     } catch (e) {}
   }
+
   async function login(email, password) {
     try {
+      setAuth({
+        error: null,
+        isAuthenticated: true,
+        user: 'mickael',
+      });
     } catch (e) {}
   }
-  async function logout() {}
+
+  async function logout() {
+    setAuth({
+      error: null,
+      isAuthenticated: false,
+      user: null,
+    });
+  }
 
   return (
     <AuthContext.Provider value={{ auth, register, login, logout }}>

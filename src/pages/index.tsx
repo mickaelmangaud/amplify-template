@@ -1,7 +1,13 @@
-import { useAuth } from '../context/authContext';
+import { useAuth } from '../context';
 
 export default function Home() {
-  const { login } = useAuth();
+  const { login, auth, logout } = useAuth();
 
-  return <h1 onClick={() => login('mickael', 'blop')}>Next Template</h1>;
+  return (
+    <div>
+      {auth.user ? <p>Vous etes connecté</p> : <p>Vous nêtes pas connecté</p>}
+      <button onClick={() => login('mickael', 'blop')}>Connexion</button>
+      <button onClick={() => logout()}>Déconnexion</button>
+    </div>
+  );
 }
