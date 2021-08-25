@@ -14,12 +14,12 @@ interface User extends CognitoUser {
 
 interface IAuthContext {
   user: User;
-  register?(username: string, email: string, password: string): Promise<void>;
+  signup?(username: string, email: string, password: string): Promise<void>;
   confirmSignup?(username: string, code: string): Promise<void>;
-  login?(email: string, password: string): Promise<void>;
-  loginWithGoogle?(): Promise<void>;
-  loginWithFacebook?(): Promise<void>;
-  logout?(): Promise<void>;
+  signin?(email: string, password: string): Promise<void>;
+  signinWithGoogle?(): Promise<void>;
+  signinWithFacebook?(): Promise<void>;
+  signout?(): Promise<void>;
 }
 
 const initialState = {
@@ -47,7 +47,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     });
   }, []);
 
-  async function register(username: string, email: string, password: string) {
+  async function signup(username: string, email: string, password: string) {
     try {
       await Auth.signUp({ username, password, attributes: { email } });
     } catch (e) {
@@ -63,7 +63,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     }
   }
 
-  async function login(email: string, password: string) {
+  async function signin(email: string, password: string) {
     try {
       await Auth.signIn(email, password);
     } catch (e) {
@@ -71,7 +71,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     }
   }
 
-  async function loginWithGoogle() {
+  async function signinWithGoogle() {
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google });
     } catch (e) {
@@ -79,7 +79,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     }
   }
 
-  async function loginWithFacebook() {
+  async function signinWithFacebook() {
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Facebook });
     } catch (e) {
@@ -87,7 +87,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     }
   }
 
-  async function logout() {
+  async function signout() {
     await Auth.signOut();
     setUser(null);
   }
@@ -96,12 +96,12 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     <AuthContext.Provider
       value={{
         user,
-        register,
-        login,
-        logout,
+        signup,
+        signinWithGoogle,
+        signinWithFacebook,
         confirmSignup,
-        loginWithGoogle,
-        loginWithFacebook,
+        signin,
+        signout,
       }}
     >
       {children}

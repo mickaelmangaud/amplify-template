@@ -2,7 +2,6 @@ import { useAuth } from '../context';
 
 export default function Home() {
   const { user } = useAuth();
-
   return (
     <div>
       <h1>
