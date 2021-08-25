@@ -2,6 +2,7 @@ import { createContext, useContext, ReactElement, useState, useEffect } from 're
 import { Auth, Hub } from 'aws-amplify';
 import { CognitoUser, CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 import { useRouter } from 'next/router';
+import React from 'react';
 
 // Fix (le type CognitoUser renvoie un truc bizarre)
 interface User extends CognitoUser {
@@ -45,9 +46,10 @@ export function AuthContextProvider({ children }: Props): ReactElement {
   }, []);
 
   useEffect(() => {
-    Hub.listen('auth', hubCapsule => {
-      if (hubCapsule) {
-        setUser(hubCapsule.payload.data);
+    Hub.listen('auth', capsule => {
+      if (capsule) {
+        console.log('capsule event', capsule.payload.event);
+        setUser(capsule.payload.data);
       }
     });
   }, []);
@@ -57,7 +59,6 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     try {
       await Auth.signUp({ username, password, attributes: { email } });
     } catch (e) {
-      console.log(e);
       setErrorMessage(e.message);
     }
   }
@@ -67,7 +68,6 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     try {
       await Auth.confirmSignUp(username, code);
     } catch (e) {
-      console.log(e);
       setErrorMessage(e.message);
     }
   }
@@ -78,7 +78,6 @@ export function AuthContextProvider({ children }: Props): ReactElement {
       await Auth.signIn(email, password);
       router.push('/');
     } catch (e) {
-      console.log(e);
       setErrorMessage(e.message);
     }
   }
@@ -88,7 +87,6 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google });
     } catch (e) {
-      console.log(e);
       setErrorMessage(e.message);
     }
   }
@@ -98,7 +96,6 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Facebook });
     } catch (e) {
-      console.log(e);
       setErrorMessage(e.message);
     }
   }
