@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
-import { CognitoUser } from '@aws-amplify/auth';
+import { CognitoUser, CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 
 // Fix (le type CognitoUser renvoie un truc bizarre)
 interface User extends CognitoUser {
@@ -18,6 +18,7 @@ interface IAuthContext {
   confirmSignup?(username: string, code: string): Promise<void>;
   login?(email: string, password: string): Promise<void>;
   loginWithGoogle?(): Promise<void>;
+  loginWithFacebook?(): Promise<void>;
   logout?(): Promise<void>;
 }
 
@@ -27,21 +28,15 @@ const initialState = {
 
 const AuthContext = createContext<IAuthContext>(initialState);
 
-interface AuthContextProviderProps {
+interface Props {
   children: ReactElement;
 }
 
-export function AuthContextProvider({ children }: AuthContextProviderProps): ReactElement {
+export function AuthContextProvider({ children }: Props): ReactElement {
   const [user, setUser] = useState<User>(null);
 
   useEffect(() => {
-    async function checkUser() {
-      const auth = await Auth.currentAuthenticatedUser();
-      if (auth) {
-        setUser(auth);
-      }
-    }
-    checkUser();
+    Auth.currentAuthenticatedUser().then(setUser).catch(console.log);
   }, []);
 
   useEffect(() => {
@@ -78,7 +73,15 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
 
   async function loginWithGoogle() {
     try {
-      await Auth.federatedSignIn({ provider: 'Google' });
+      await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function loginWithFacebook() {
+    try {
+      await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Facebook });
     } catch (e) {
       console.log(e);
     }
@@ -98,6 +101,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps): Rea
         logout,
         confirmSignup,
         loginWithGoogle,
+        loginWithFacebook,
       }}
     >
       {children}
