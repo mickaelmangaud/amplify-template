@@ -12,7 +12,7 @@ export default function Auth() {
       <button onClick={() => signup('mickael', 'mickaelmangaud@gmail.com', '55555wR*')}>
         Register
       </button>
-      <button onClick={() => confirmSignup('mickael', '183783')}>ConfirmSignup</button>
+      <button onClick={() => confirmSignup('mickael', '924429')}>ConfirmSignup</button>
       <button onClick={() => signinWithGoogle()}>Google</button>
       <button onClick={() => signinWithFacebook()}>Facebook</button>
     </div>

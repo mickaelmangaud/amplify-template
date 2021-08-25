@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
 import { CognitoUser, CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
+import { useRouter } from 'next/router';
 
 // Fix (le type CognitoUser renvoie un truc bizarre)
 interface User extends CognitoUser {
@@ -34,6 +35,7 @@ interface Props {
 
 export function AuthContextProvider({ children }: Props): ReactElement {
   const [user, setUser] = useState<User>(null);
+  const router = useRouter();
 
   useEffect(() => {
     Auth.currentAuthenticatedUser().then(setUser).catch(console.log);
@@ -66,6 +68,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
   async function signin(email: string, password: string) {
     try {
       await Auth.signIn(email, password);
+      router.push('/');
     } catch (e) {
       console.log(e);
     }
@@ -90,6 +93,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
   async function signout() {
     await Auth.signOut();
     setUser(null);
+    router.push('/');
   }
 
   return (
