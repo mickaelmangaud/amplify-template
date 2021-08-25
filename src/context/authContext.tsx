@@ -14,7 +14,8 @@ interface User extends CognitoUser {
 }
 
 interface IAuthContext {
-  user: User;
+  errorMessage: string | null;
+  user: User | null;
   signup?(username: string, email: string, password: string): Promise<void>;
   confirmSignup?(username: string, code: string): Promise<void>;
   signin?(email: string, password: string): Promise<void>;
@@ -25,6 +26,7 @@ interface IAuthContext {
 
 const initialState = {
   user: null,
+  errorMessage: null,
 };
 
 const AuthContext = createContext<IAuthContext>(initialState);
@@ -34,7 +36,8 @@ interface Props {
 }
 
 export function AuthContextProvider({ children }: Props): ReactElement {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,55 +53,71 @@ export function AuthContextProvider({ children }: Props): ReactElement {
   }, []);
 
   async function signup(username: string, email: string, password: string) {
+    setErrorMessage(null);
     try {
       await Auth.signUp({ username, password, attributes: { email } });
     } catch (e) {
       console.log(e);
+      setErrorMessage(e.message);
     }
   }
 
   async function confirmSignup(username: string, code: string) {
+    setErrorMessage(null);
     try {
       await Auth.confirmSignUp(username, code);
     } catch (e) {
       console.log(e);
+      setErrorMessage(e.message);
     }
   }
 
   async function signin(email: string, password: string) {
+    setErrorMessage(null);
     try {
       await Auth.signIn(email, password);
       router.push('/');
     } catch (e) {
       console.log(e);
+      setErrorMessage(e.message);
     }
   }
 
   async function signinWithGoogle() {
+    setErrorMessage(null);
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google });
     } catch (e) {
       console.log(e);
+      setErrorMessage(e.message);
     }
   }
 
   async function signinWithFacebook() {
+    setErrorMessage(null);
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Facebook });
     } catch (e) {
       console.log(e);
+      setErrorMessage(e.message);
     }
   }
 
   async function signout() {
-    await Auth.signOut();
-    setUser(null);
-    router.push('/');
+    setErrorMessage(null);
+    try {
+      await Auth.signOut();
+      setUser(null);
+      router.push('/');
+    } catch (e) {
+      setErrorMessage(e.message);
+    }
   }
 
   return (
     <AuthContext.Provider
       value={{
+        errorMessage,
         user,
         signup,
         signinWithGoogle,

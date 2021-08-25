@@ -1,12 +1,20 @@
 import { useAuth } from '../../context';
 
 export default function Auth() {
-  const { signin, signout, signup, confirmSignup, signinWithGoogle, signinWithFacebook } =
-    useAuth();
+  const {
+    signin,
+    signout,
+    signup,
+    confirmSignup,
+    signinWithGoogle,
+    signinWithFacebook,
+    errorMessage,
+  } = useAuth();
 
   return (
     <div>
       <h1>Auth</h1>
+      <p>{errorMessage}</p>
       <button onClick={() => signin('mickaelmangaud@gmail.com', '55555wR*')}>Connexion</button>
       <button onClick={() => signout()}>Déconnexion</button>
       <button onClick={() => signup('mickael', 'mickaelmangaud@gmail.com', '55555wR*')}>
