@@ -1,0 +1,1 @@
+export { updatedconfig } from './amplify';
