@@ -2,6 +2,7 @@ import config from '../aws-exports';
 
 export let isLocalhost = true;
 
+/* https://docs.amplify.aws/lib/auth/social/q/platform/js/#configure-auth-category */
 if (!(typeof window === 'undefined')) {
   isLocalhost = Boolean(
     window.location.hostname === 'localhost' ||
