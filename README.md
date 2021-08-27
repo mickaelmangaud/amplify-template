@@ -1,1 +1,1 @@
-# tempo
+# amplify-template
