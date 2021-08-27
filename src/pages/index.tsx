@@ -15,7 +15,7 @@ export default function Home() {
     <div>
       <button onClick={logout}>SIGNOUT</button>
       <h1>
-        Bonjour {user?.attributes?.email} - {user?.username}
+        Bonjour {user?.email} - {user?.username}
       </h1>
     </div>
   );
