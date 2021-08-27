@@ -1,9 +1,19 @@
 import { useAuth } from '../context';
+import { useRouter } from 'next/router';
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, signout } = useAuth();
+  const router = useRouter();
+
+  const logout = async e => {
+    e.preventDefault();
+    await signout();
+    router.push('/auth');
+  };
+
   return (
     <div>
+      <button onClick={logout}>SIGNOUT</button>
       <h1>
         Bonjour {user?.attributes?.email} - {user?.username}
       </h1>

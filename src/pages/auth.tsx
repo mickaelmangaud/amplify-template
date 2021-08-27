@@ -1,117 +1,130 @@
 import { useState } from 'react';
 import { useAuth } from '../context';
+import { AuthScreen, Form, Title, Input, Submit } from '../styles/auth';
 
 type AuthStep = 'login' | 'register' | 'forgotPassword' | 'confirmRegister';
 
 export default function Auth() {
-  const [email, setEmail] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [password, setPassword] = useState<string | null>(null);
-  const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
+  const [email, setEmail] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmationCode, setConfirmationCode] = useState<string>('');
   const [authStep, setAuthStep] = useState<AuthStep>('login');
 
-  const {
-    signin,
-    signup,
-    signinWithFacebook,
-    signinWithGoogle,
-    signout,
-    confirmSignup,
-    errorMessage,
-  } = useAuth();
+  const { signin, signup, signout, confirmSignup, errorMessage, loading } = useAuth();
 
   const login = e => {
     e.preventDefault();
-    signin(email, password);
+    if (email && password) {
+      signin(email, password);
+    }
   };
 
-  const register = e => {
+  const register = async e => {
     e.preventDefault();
-    signup(username, email, password);
+    if (username && email && password) {
+      await signup(username, email, password);
+      setAuthStep('confirmRegister');
+    }
   };
 
   const confirmRegister = async e => {
     e.preventDefault();
-    confirmSignup(username, confirmationCode);
+    if (username && confirmationCode) {
+      confirmSignup(username, confirmationCode);
+    }
   };
 
   return (
-    <div>
-      <div>
-        {errorMessage && errorMessage}
-        <button onClick={() => setAuthStep('login')}>LOGIN</button>
-        <button onClick={() => setAuthStep('register')}>Register</button>
-        <button onClick={() => setAuthStep('confirmRegister')}>CONFIRM REGISTER</button>
-        <button onClick={() => setAuthStep('forgotPassword')}>FORGOT PASSWORD</button>
-        <button onClick={() => signout()}>SIGNOUT</button>
-      </div>
+    <AuthScreen>
+      <div>{errorMessage && errorMessage}</div>
+
+      {/* LOGIN */}
+
       {authStep === 'login' && (
-        <form onSubmit={login}>
-          <h1>LOGIN</h1>
-          <input
+        <Form onSubmit={login}>
+          <Title>LOGIN</Title>
+          <Input
             type="text"
             value={email}
             placeholder="Email ..."
             onChange={e => setEmail(e.target.value)}
           />
-          <input
+          <Input
             type="text"
             value={password}
             placeholder="Password ..."
             onChange={e => setPassword(e.target.value)}
           />
-          <button type="submit">Connexion</button>
-        </form>
+          <p onClick={() => setAuthStep('forgotPassword')}>Forgot Password</p>
+          <p>{loading && 'LOADING'}</p>
+          <Submit type="submit">Connexion</Submit>
+          <p onClick={() => setAuthStep('register')}>Don&apos;t have an account? Register...</p>
+        </Form>
       )}
+
+      {/* REGISTER */}
+
       {authStep === 'register' && (
-        <form onSubmit={register}>
-          <h1>REGISTER</h1>
-          <input
+        <Form onSubmit={register}>
+          <Title>REGISTER</Title>
+          <Input
             type="text"
             value={email}
             placeholder="Email ..."
             onChange={e => setEmail(e.target.value)}
           />
-          <input
+          <Input
             type="text"
             value={username}
             placeholder="Username ..."
             onChange={e => setUsername(e.target.value)}
           />
-          <input
+          <Input
             type="text"
             value={password}
             placeholder="Password ..."
             onChange={e => setPassword(e.target.value)}
           />
-          <button type="submit">Register</button>
-        </form>
+          <p>{loading && 'LOADING'}</p>
+          <Submit type="submit">Register</Submit>
+          <p onClick={() => setAuthStep('login')}>Already an account? Login...</p>
+        </Form>
       )}
+
+      {/* CONFIRM REGISTER */}
+
       {authStep === 'confirmRegister' && (
-        <form onSubmit={confirmRegister}>
-          <h1>CONFIRM REGISTER</h1>
-          <input
+        <Form onSubmit={confirmRegister}>
+          <Title>CONFIRM REGISTER</Title>
+          <Input
             type="text"
             value={username}
             placeholder="Username ..."
             onChange={e => setUsername(e.target.value)}
           />
-          <input
+          <Input
             type="text"
             value={confirmationCode}
             placeholder="Confirmation Code ..."
             onChange={e => setConfirmationCode(e.target.value)}
           />
-          <button type="submit">Confirm Code</button>
-        </form>
+          <p>{loading && 'LOADING'}</p>
+          <Submit type="submit">Confirm Code</Submit>
+        </Form>
       )}
+
+      {/* FORGOT PASSWORD */}
+
       {authStep === 'forgotPassword' && (
-        <form>
-          <h1>FORGOT PASSWORD</h1>
-          <input type="text" value={email} placeholder="Email ..." />
-          <button type="submit">Send email</button>
-        </form>
+        <Form>
+          <Title>FORGOT PASSWORD</Title>
+          <Input type="text" value={email} placeholder="Email ..." />
+          <Submit type="submit">Send email</Submit>
+          <p>{loading && 'LOADING'}</p>
+          <p onClick={() => setAuthStep('login')}>Login</p>
+        </Form>
       )}
-    </div>
+    </AuthScreen>
   );
 }

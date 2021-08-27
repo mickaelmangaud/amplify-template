@@ -5,18 +5,17 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 // Fix (le type CognitoUser renvoie un truc bizarre)
-interface User extends CognitoUser {
-  attributes: {
-    sub: string;
-    email: string;
-    email_verified: string;
-  };
+interface User {
+  sub: string;
+  email: string;
+  email_verified: boolean;
   username: string;
 }
 
 interface IAuthContext {
   errorMessage: string | null;
   user: User | null;
+  loading: boolean;
   signup?(username: string, email: string, password: string): Promise<void>;
   confirmSignup?(username: string, code: string): Promise<void>;
   signin?(email: string, password: string): Promise<void>;
@@ -28,6 +27,7 @@ interface IAuthContext {
 const initialState = {
   user: null,
   errorMessage: null,
+  loading: false,
 };
 
 const AuthContext = createContext<IAuthContext>(initialState);
@@ -39,68 +39,98 @@ interface Props {
 export function AuthContextProvider({ children }: Props): ReactElement {
   const [user, setUser] = useState<User | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
-    Auth.currentAuthenticatedUser().then(setUser).catch(console.log);
+    Auth.currentAuthenticatedUser()
+      .then(user => {
+        setUser({
+          email: user.attributes.email,
+          username: user.username,
+          sub: user.attributes.sub,
+          email_verified: user.attributes.email_verified,
+        });
+      })
+      .catch(console.log);
   }, []);
 
   useEffect(() => {
     Hub.listen('auth', capsule => {
       if (capsule) {
-        console.log('capsule event', capsule.payload.event);
-        setUser(capsule.payload.data);
+        setUser({
+          email: capsule.payload.data.attributes.email,
+          username: capsule.payload.data.username,
+          sub: capsule.payload.data.attributes.sub,
+          email_verified: capsule.payload.data.attributes.email_verified,
+        });
       }
     });
   }, []);
 
   async function signup(username: string, email: string, password: string) {
+    setLoading(true);
     setErrorMessage(null);
     try {
       await Auth.signUp({ username, password, attributes: { email } });
     } catch (e) {
       setErrorMessage(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function confirmSignup(username: string, code: string) {
+    setLoading(true);
     setErrorMessage(null);
     try {
       await Auth.confirmSignUp(username, code);
     } catch (e) {
       setErrorMessage(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function signin(email: string, password: string) {
+    setLoading(true);
     setErrorMessage(null);
     try {
       await Auth.signIn(email, password);
       router.push('/');
     } catch (e) {
       setErrorMessage(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function signinWithGoogle() {
+    setLoading(true);
     setErrorMessage(null);
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google });
     } catch (e) {
       setErrorMessage(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function signinWithFacebook() {
+    setLoading(true);
     setErrorMessage(null);
     try {
       await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Facebook });
     } catch (e) {
       setErrorMessage(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function signout() {
+    setLoading(true);
     setErrorMessage(null);
     try {
       await Auth.signOut();
@@ -108,6 +138,8 @@ export function AuthContextProvider({ children }: Props): ReactElement {
       router.push('/');
     } catch (e) {
       setErrorMessage(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -116,6 +148,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
       value={{
         errorMessage,
         user,
+        loading,
         signup,
         signinWithGoogle,
         signinWithFacebook,
