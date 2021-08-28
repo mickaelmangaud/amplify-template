@@ -1,6 +1,7 @@
+import router from 'next/router';
 import { useState } from 'react';
 import { useAuth } from '../context';
-import { AuthScreen, Form, Title, Input, Submit } from '../styles/auth';
+import { AuthScreen, Form, Title, Input, Submit, SocialButton } from '../styles/auth';
 
 type AuthStep = 'login' | 'register' | 'forgotPassword' | 'confirmRegister';
 
@@ -11,7 +12,16 @@ export default function Auth() {
   const [confirmationCode, setConfirmationCode] = useState<string>('');
   const [authStep, setAuthStep] = useState<AuthStep>('login');
 
-  const { signin, signup, signout, confirmSignup, errorMessage, loading } = useAuth();
+  const {
+    signin,
+    signup,
+    signout,
+    confirmSignup,
+    errorMessage,
+    loading,
+    signinWithFacebook,
+    signinWithGoogle,
+  } = useAuth();
 
   const login = e => {
     e.preventDefault();
@@ -43,7 +53,7 @@ export default function Auth() {
 
       {authStep === 'login' && (
         <Form onSubmit={login}>
-          <Title>LOGIN</Title>
+          {/* <Title>LOGIN</Title> */}
           <Input
             type="text"
             value={email}
@@ -55,17 +65,26 @@ export default function Auth() {
             value={password}
             placeholder="Password ..."
             onChange={e => setPassword(e.target.value)}
+            autoComplete="false"
           />
           <p onClick={() => setAuthStep('forgotPassword')}>Forgot Password</p>
           <p>{loading && 'LOADING'}</p>
           <Submit type="submit">Connexion</Submit>
           <p onClick={() => setAuthStep('register')}>Don&apos;t have an account? Register...</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <SocialButton style={{ backgroundColor: '#3b5998' }} onClick={signinWithFacebook}>
+              Facebook
+            </SocialButton>
+            <SocialButton style={{ backgroundColor: '#E94235' }} onClick={signinWithGoogle}>
+              Google
+            </SocialButton>
+          </div>
         </Form>
       )}
 
       {/* REGISTER */}
 
-      {authStep === 'register' && (
+      {/* {authStep === 'register' && (
         <Form onSubmit={register}>
           <Title>REGISTER</Title>
           <Input
@@ -88,7 +107,38 @@ export default function Auth() {
           />
           <p>{loading && 'LOADING'}</p>
           <Submit type="submit">Register</Submit>
+          <SocialButton>Continuer with Facebook</SocialButton>
+          <SocialButton>Continuer with Google</SocialButton>
           <p onClick={() => setAuthStep('login')}>Already an account? Login...</p>
+        </Form>
+      )} */}
+
+      {authStep === 'register' && (
+        <Form>
+          <Input
+            type="text"
+            value={username}
+            placeholder="Username ..."
+            onChange={e => setUsername(e.target.value)}
+          />
+          <Input
+            type="password"
+            value={password}
+            placeholder="Password ..."
+            onChange={e => setPassword(e.target.value)}
+            autoComplete="false"
+          />
+          <Input
+            type="text"
+            value={email}
+            placeholder="Email ..."
+            onChange={e => setEmail(e.target.value)}
+            autoComplete="false"
+          />
+          <Submit>create</Submit>
+          <div>
+            Already registered? <div onClick={() => setAuthStep('login')}>Sign In</div>
+          </div>
         </Form>
       )}
 
@@ -96,7 +146,6 @@ export default function Auth() {
 
       {authStep === 'confirmRegister' && (
         <Form onSubmit={confirmRegister}>
-          <Title>CONFIRM REGISTER</Title>
           <Input
             type="text"
             value={username}

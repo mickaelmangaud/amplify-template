@@ -2,23 +2,20 @@ import styled from 'styled-components';
 
 export const AuthScreen = styled.div`
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: 100vh;
 `;
 
 export const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 90%;
-  max-width: 460px;
-  height: 480px;
-  background-color: white;
-  border-radius: 3px;
-  box-shadow: 0px 0px 2px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  max-width: 360px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 `;
 
 export const Title = styled.h1`
@@ -26,23 +23,34 @@ export const Title = styled.h1`
 `;
 
 export const Input = styled.input`
-  padding: 12px 18px;
-  border-radius: 3px;
-  margin: 12px auto;
-  border: none;
-  width: 90%;
-  max-width: 350px;
+  font-family: 'Roboto', sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
 `;
 
 export const Submit = styled.button`
-  padding: 12px 18px;
-  border-radius: 3px;
-  margin: 12px auto;
-  width: 90%;
-  max-width: 350px;
-  border: none;
-  background-color: #88e988;
-  color: white;
   text-transform: uppercase;
-  font-weight: bold;
+  outline: 0;
+  background: #4caf50;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    background: #43a047;
+  }
+`;
+
+export const SocialButton = styled(Submit)`
+  margin: 12px 0;
+  width: 48%;
 `;

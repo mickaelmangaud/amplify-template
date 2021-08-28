@@ -57,7 +57,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
 
   useEffect(() => {
     Hub.listen('auth', capsule => {
-      if (capsule) {
+      if (capsule.payload.event === 'signin') {
         setUser({
           email: capsule.payload.data.attributes.email,
           username: capsule.payload.data.username,
