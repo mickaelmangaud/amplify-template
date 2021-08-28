@@ -36,7 +36,6 @@ export default function Auth() {
     e.preventDefault();
     if (email && password) {
       await signin(email, password);
-      router.push('/');
     }
   };
 

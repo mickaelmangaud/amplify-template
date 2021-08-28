@@ -4,7 +4,7 @@ import { CognitoUser, CognitoHostedUIIdentityProvider } from '@aws-amplify/auth'
 import { useRouter } from 'next/router';
 import React from 'react';
 
-// Fix (le type CognitoUser renvoie un truc bizarre)
+// (le type CognitoUser renvoie un truc bizarre)
 interface User {
   sub: string;
   email: string;
@@ -41,29 +41,24 @@ export function AuthContextProvider({ children }: Props): ReactElement {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-  console.log('user', user);
+
+  const saveUser = (user: any) =>
+    setUser({
+      email: user.attributes.email,
+      username: user.username,
+      sub: user.attributes.sub,
+      email_verified: user.attributes.email_verified,
+    });
+
   useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then(user => {
-        setUser({
-          email: user.attributes.email,
-          username: user.username,
-          sub: user.attributes.sub,
-          email_verified: user.attributes.email_verified,
-        });
-      })
-      .catch(console.log);
+    Auth.currentAuthenticatedUser().then(saveUser).catch(console.log);
   }, []);
 
   useEffect(() => {
     Hub.listen('auth', capsule => {
-      if (capsule.payload.event === 'signIn') {
-        setUser({
-          email: capsule.payload.data.attributes.email,
-          username: capsule.payload.data.username,
-          sub: capsule.payload.data.attributes.sub,
-          email_verified: capsule.payload.data.attributes.email_verified,
-        });
+      switch (capsule.payload.event) {
+        case 'signIn':
+          Auth.currentAuthenticatedUser().then(saveUser).catch(console.log);
       }
     });
   }, []);
@@ -97,9 +92,9 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     setErrorMessage(null);
     try {
       await Auth.signIn(email, password);
+      router.push('/');
     } catch (e) {
       setErrorMessage(e.message);
-      console.log('error', e);
     } finally {
       setLoading(false);
     }
@@ -135,6 +130,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     try {
       await Auth.signOut();
       setUser(null);
+      router.push('/auth');
     } catch (e) {
       setErrorMessage(e.message);
     } finally {
