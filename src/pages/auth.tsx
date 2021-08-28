@@ -119,7 +119,12 @@ export default function Auth() {
       {authStep === 'forgotPassword' && (
         <Form>
           <Title>FORGOT PASSWORD</Title>
-          <Input type="text" value={email} placeholder="Email ..." />
+          <Input
+            type="text"
+            value={email}
+            placeholder="Email ..."
+            onChange={e => setConfirmationCode(e.target.value)}
+          />
           <Submit type="submit">Send email</Submit>
           <p>{loading && 'LOADING'}</p>
           <p onClick={() => setAuthStep('login')}>Login</p>
