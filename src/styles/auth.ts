@@ -5,7 +5,6 @@ export const AuthScreen = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #2c3e50;
 `;
 
 export const Form = styled.form`

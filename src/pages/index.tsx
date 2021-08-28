@@ -1,16 +1,12 @@
 import { useAuth } from '../context';
-import { useRouter } from 'next/router';
 
 export default function Home() {
   const { user, signout } = useAuth();
-  const router = useRouter();
 
   const logout = async e => {
     e.preventDefault();
     await signout();
-    router.push('/auth');
   };
-  console.log(user);
 
   return (
     <div>

@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
-import { CognitoUser, CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
+import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 import { useRouter } from 'next/router';
 import React from 'react';
 
