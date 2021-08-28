@@ -10,6 +10,7 @@ export default function Home() {
     await signout();
     router.push('/auth');
   };
+  console.log(user);
 
   return (
     <div>

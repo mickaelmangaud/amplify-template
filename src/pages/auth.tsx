@@ -1,7 +1,16 @@
 import router from 'next/router';
 import { useState } from 'react';
 import { useAuth } from '../context';
-import { AuthScreen, Form, Title, Input, Submit, SocialButton } from '../styles/auth';
+import {
+  AuthScreen,
+  Form,
+  Title,
+  Input,
+  Submit,
+  SocialButton,
+  Text,
+  ForgotPassword,
+} from '../styles/auth';
 
 type AuthStep = 'login' | 'register' | 'forgotPassword' | 'confirmRegister';
 
@@ -23,10 +32,11 @@ export default function Auth() {
     signinWithGoogle,
   } = useAuth();
 
-  const login = e => {
+  const login = async e => {
     e.preventDefault();
     if (email && password) {
-      signin(email, password);
+      await signin(email, password);
+      router.push('/');
     }
   };
 
@@ -45,6 +55,14 @@ export default function Auth() {
     }
   };
 
+  if (loading) {
+    return (
+      <AuthScreen>
+        <Form>LOADING</Form>
+      </AuthScreen>
+    );
+  }
+
   return (
     <AuthScreen>
       <div>{errorMessage && errorMessage}</div>
@@ -53,91 +71,83 @@ export default function Auth() {
 
       {authStep === 'login' && (
         <Form onSubmit={login}>
-          {/* <Title>LOGIN</Title> */}
-          <Input
-            type="text"
-            value={email}
-            placeholder="Email ..."
-            onChange={e => setEmail(e.target.value)}
-          />
-          <Input
-            type="text"
-            value={password}
-            placeholder="Password ..."
-            onChange={e => setPassword(e.target.value)}
-            autoComplete="false"
-          />
-          <p onClick={() => setAuthStep('forgotPassword')}>Forgot Password</p>
-          <p>{loading && 'LOADING'}</p>
-          <Submit type="submit">Connexion</Submit>
-          <p onClick={() => setAuthStep('register')}>Don&apos;t have an account? Register...</p>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <SocialButton style={{ backgroundColor: '#3b5998' }} onClick={signinWithFacebook}>
-              Facebook
-            </SocialButton>
-            <SocialButton style={{ backgroundColor: '#E94235' }} onClick={signinWithGoogle}>
-              Google
-            </SocialButton>
+          <div>
+            <Input
+              type="text"
+              value={email}
+              placeholder="Email ..."
+              onChange={e => setEmail(e.target.value)}
+            />
+            <Input
+              type="password"
+              value={password}
+              placeholder="Password ..."
+              onChange={e => setPassword(e.target.value)}
+              autoComplete="false"
+            />
+            <ForgotPassword onClick={() => setAuthStep('forgotPassword')}>
+              forgot password
+            </ForgotPassword>
+          </div>
+
+          <div>
+            <Submit type="submit">Connexion</Submit>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <SocialButton style={{ backgroundColor: '#3b5998' }} onClick={signinWithFacebook}>
+                Facebook
+              </SocialButton>
+              <SocialButton style={{ backgroundColor: '#E94235' }} onClick={signinWithGoogle}>
+                Google
+              </SocialButton>
+            </div>
+            <Text onClick={() => setAuthStep('register')}>
+              Don&apos;t have an account?{' '}
+              <span style={{ color: 'green', fontWeight: 'bold' }}>Register...</span>
+            </Text>
           </div>
         </Form>
       )}
 
       {/* REGISTER */}
 
-      {/* {authStep === 'register' && (
-        <Form onSubmit={register}>
-          <Title>REGISTER</Title>
-          <Input
-            type="text"
-            value={email}
-            placeholder="Email ..."
-            onChange={e => setEmail(e.target.value)}
-          />
-          <Input
-            type="text"
-            value={username}
-            placeholder="Username ..."
-            onChange={e => setUsername(e.target.value)}
-          />
-          <Input
-            type="text"
-            value={password}
-            placeholder="Password ..."
-            onChange={e => setPassword(e.target.value)}
-          />
-          <p>{loading && 'LOADING'}</p>
-          <Submit type="submit">Register</Submit>
-          <SocialButton>Continuer with Facebook</SocialButton>
-          <SocialButton>Continuer with Google</SocialButton>
-          <p onClick={() => setAuthStep('login')}>Already an account? Login...</p>
-        </Form>
-      )} */}
-
       {authStep === 'register' && (
         <Form>
-          <Input
-            type="text"
-            value={username}
-            placeholder="Username ..."
-            onChange={e => setUsername(e.target.value)}
-          />
-          <Input
-            type="password"
-            value={password}
-            placeholder="Password ..."
-            onChange={e => setPassword(e.target.value)}
-            autoComplete="false"
-          />
-          <Input
-            type="text"
-            value={email}
-            placeholder="Email ..."
-            onChange={e => setEmail(e.target.value)}
-            autoComplete="false"
-          />
-          <Submit>create</Submit>
           <div>
-            Already registered? <div onClick={() => setAuthStep('login')}>Sign In</div>
+            <Input
+              type="text"
+              value={username}
+              placeholder="Username ..."
+              onChange={e => setUsername(e.target.value)}
+            />
+            <Input
+              type="password"
+              value={password}
+              placeholder="Password ..."
+              onChange={e => setPassword(e.target.value)}
+              autoComplete="false"
+            />
+            <Input
+              type="text"
+              value={email}
+              placeholder="Email ..."
+              onChange={e => setEmail(e.target.value)}
+              autoComplete="false"
+            />
+          </div>
+          <div>
+            <Submit>register</Submit>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <SocialButton style={{ backgroundColor: '#3b5998' }} onClick={signinWithFacebook}>
+                Facebook
+              </SocialButton>
+              <SocialButton style={{ backgroundColor: '#E94235' }} onClick={signinWithGoogle}>
+                Google
+              </SocialButton>
+            </div>
+            <Text onClick={() => setAuthStep('login')}>
+              Already registered?{' '}
+              <span style={{ color: 'green', fontWeight: 'bold' }}>Sign in...</span>
+            </Text>
           </div>
         </Form>
       )}
@@ -176,7 +186,7 @@ export default function Auth() {
           />
           <Submit type="submit">Send email</Submit>
           <p>{loading && 'LOADING'}</p>
-          <p onClick={() => setAuthStep('login')}>Login</p>
+          <Text onClick={() => setAuthStep('login')}>Login</Text>
         </Form>
       )}
     </AuthScreen>

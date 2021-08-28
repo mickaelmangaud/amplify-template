@@ -41,7 +41,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-
+  console.log('user', user);
   useEffect(() => {
     Auth.currentAuthenticatedUser()
       .then(user => {
@@ -57,7 +57,7 @@ export function AuthContextProvider({ children }: Props): ReactElement {
 
   useEffect(() => {
     Hub.listen('auth', capsule => {
-      if (capsule.payload.event === 'signin') {
+      if (capsule.payload.event === 'signIn') {
         setUser({
           email: capsule.payload.data.attributes.email,
           username: capsule.payload.data.username,
@@ -97,9 +97,9 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     setErrorMessage(null);
     try {
       await Auth.signIn(email, password);
-      router.push('/');
     } catch (e) {
       setErrorMessage(e.message);
+      console.log('error', e);
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,6 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     try {
       await Auth.signOut();
       setUser(null);
-      router.push('/');
     } catch (e) {
       setErrorMessage(e.message);
     } finally {
