@@ -1,76 +1,96 @@
 import { useState, useEffect } from 'react';
 import { API, graphqlOperation } from 'aws-amplify';
-import { GraphQLResult } from '@aws-amplify/api';
-import { listTodos, getTodo } from '../graphql/queries';
-import { deleteTodo, updateTodo, createTodo } from '../graphql/mutations';
+import { GraphQLResult, GRAPHQL_AUTH_MODE } from '@aws-amplify/api';
+import { listPosts, getPost } from '../graphql/queries';
+import { deletePost, updatePost, createPost } from '../graphql/mutations';
 import { compareDesc } from 'date-fns';
 
 import {
-  Todo,
-  GetTodoQuery,
-  ListTodosQuery,
-  CreateTodoMutation,
-  CreateTodoInput,
-  UpdateTodoMutation,
-  UpdateTodoInput,
-  DeleteTodoMutation,
-  DeleteTodoInput,
+  Post,
+  GetPostQuery,
+  ListPostsQuery,
+  CreatePostMutation,
+  CreatePostInput,
+  UpdatePostMutation,
+  UpdatePostInput,
+  DeletePostMutation,
+  DeletePostInput,
 } from '../API';
 
 export function usePost() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    async function getTodos() {
-      const { data } = await (API.graphql(graphqlOperation(listTodos)) as Promise<GraphQLResult<ListTodosQuery>>);
-      data.listTodos.items.sort((a, b) => compareDesc(new Date(a.createdAt), new Date(b.createdAt)));
-      setTodos(data.listTodos.items);
+    async function getPosts() {
+      const { data } = await (API.graphql(
+        graphqlOperation(listPosts)
+      ) as Promise<GraphQLResult<ListPostsQuery>>);
+
+      data.listPosts.items.sort((a, b) =>
+        compareDesc(new Date(a.createdAt), new Date(b.createdAt))
+      );
+      setPosts(data.listPosts.items);
     }
 
-    getTodos();
+    getPosts();
   }, []);
 
-  async function createNewTodo(todo: CreateTodoInput) {
+  async function createNewPost(Post: CreatePostInput) {
     try {
-      const { data } = await (API.graphql(graphqlOperation(createTodo, { input: todo })) as Promise<
-        GraphQLResult<CreateTodoMutation>
-      >);
-      setTodos([data.createTodo, ...todos]);
+      const { data } = await (API.graphql({
+        query: createPost,
+        variables: { input: Post },
+        authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+      }) as Promise<GraphQLResult<CreatePostMutation>>);
+
+      setPosts([data.createPost, ...posts]);
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function getTodoById(id: string) {
-    const { data } = await (API.graphql({ query: getTodo, variables: { id } }) as Promise<
-      GraphQLResult<GetTodoQuery>
-    >);
-    console.log(data.getTodo);
+  async function getPostById(id: string) {
+    const { data } = await (API.graphql({
+      query: getPost,
+      variables: { id },
+      authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+    }) as Promise<GraphQLResult<GetPostQuery>>);
+
+    console.log(data.getPost);
     try {
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function updateTodoById(input: UpdateTodoInput) {
+  async function updatePostById(input: UpdatePostInput) {
     try {
-      const { data } = await (API.graphql(graphqlOperation(updateTodo, { input })) as Promise<
-        GraphQLResult<UpdateTodoMutation>
-      >);
-      setTodos(todos => todos.map(t => (t.id === data.updateTodo.id ? data.updateTodo : t)));
+      const { data } = await (API.graphql({
+        query: updatePost,
+        variables: { input },
+        authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+      }) as Promise<GraphQLResult<UpdatePostMutation>>);
+
+      setPosts(Posts =>
+        posts.map(t => (t.id === data.updatePost.id ? data.updatePost : t))
+      );
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function deleteTodoById(input: DeleteTodoInput) {
+  async function deletePostById(input: DeletePostInput) {
     try {
-      await (API.graphql(graphqlOperation(deleteTodo, { input })) as Promise<GraphQLResult<DeleteTodoMutation>>);
-      setTodos(todos => todos.filter(t => t.id !== input.id));
+      await (API.graphql({
+        query: deletePost,
+        variables: { input },
+        authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+      }) as Promise<GraphQLResult<DeletePostMutation>>);
+      setPosts(posts => posts.filter(t => t.id !== input.id));
     } catch (e) {
       console.log(e);
     }
   }
 
-  return { todos, deleteTodoById, updateTodoById, createNewTodo, getTodoById };
+  return { posts, deletePostById, updatePostById, createNewPost, getPostById };
 }

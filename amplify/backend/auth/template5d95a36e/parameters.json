@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "template5978d173_identitypool_5978d173",
+    "identityPoolName": "template5d95a36e_identitypool_5d95a36e",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "templa5978d173",
-    "userPoolName": "template5978d173_userpool_5978d173",
+    "resourceNameTruncated": "templa5d95a36e",
+    "userPoolName": "template5d95a36e_userpool_5d95a36e",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -31,10 +31,10 @@
     "userpoolClientReadAttributes": [
         "email"
     ],
-    "userpoolClientLambdaRole": "templa5978d173_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "templa5d95a36e_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "5978d173",
-    "resourceName": "template5978d173",
+    "sharedId": "5d95a36e",
+    "resourceName": "template5d95a36e",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [
@@ -50,7 +50,7 @@
     },
     "useDefault": "defaultSocial",
     "hostedUI": true,
-    "hostedUIDomainName": "template",
+    "hostedUIDomainName": "template5d95a36e-5d95a36e",
     "authProvidersUserPool": [
         "Facebook",
         "Google"

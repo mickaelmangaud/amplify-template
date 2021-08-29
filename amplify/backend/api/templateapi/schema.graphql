@@ -1,5 +1,9 @@
-type Todo @model {
+type Post
+  @model
+  @key(name: "postsByUsername", fields: ["username"], queryField: "postByUsername")
+  @auth(rules: [{ allow: owner, ownerField: "username" }, { allow: public, operations: [read] }]) {
   id: ID!
-  name: String!
-  description: String
+  title: String!
+  content: String
+  username: String
 }
