@@ -3,7 +3,7 @@ import { updatedconfig } from '../utils';
 import { GlobalStyles } from '../components/GlobalStyles';
 import Amplify from 'aws-amplify';
 
-Amplify.configure(updatedconfig);
+Amplify.configure({ ...updatedconfig, ssr: true });
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
