@@ -1,8 +1,7 @@
-import { createContext, useContext, ReactElement, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
 import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 import { useRouter } from 'next/router';
-import React from 'react';
 
 // (le type CognitoUser renvoie un truc bizarre)
 interface User {
@@ -12,31 +11,7 @@ interface User {
   username: string;
 }
 
-interface IAuthContext {
-  errorMessage: string | null;
-  user: User | null;
-  loading: boolean;
-  signup?(username: string, email: string, password: string): Promise<void>;
-  confirmSignup?(username: string, code: string): Promise<void>;
-  signin?(email: string, password: string): Promise<void>;
-  signinWithGoogle?(): Promise<void>;
-  signinWithFacebook?(): Promise<void>;
-  signout?(): Promise<void>;
-}
-
-const initialState = {
-  user: null,
-  errorMessage: null,
-  loading: false,
-};
-
-const AuthContext = createContext<IAuthContext>(initialState);
-
-interface Props {
-  children: ReactElement;
-}
-
-export function AuthContextProvider({ children }: Props): ReactElement {
+export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -138,23 +113,15 @@ export function AuthContextProvider({ children }: Props): ReactElement {
     }
   }
 
-  return (
-    <AuthContext.Provider
-      value={{
-        errorMessage,
-        user,
-        loading,
-        signup,
-        signinWithGoogle,
-        signinWithFacebook,
-        confirmSignup,
-        signin,
-        signout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return {
+    errorMessage,
+    user,
+    loading,
+    signup,
+    signinWithGoogle,
+    signinWithFacebook,
+    confirmSignup,
+    signin,
+    signout,
+  };
 }
-
-export const useAuth = () => useContext(AuthContext);

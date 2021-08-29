@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "templatedcf45b08_identitypool_dcf45b08",
+    "identityPoolName": "template5978d173_identitypool_5978d173",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "templadcf45b08",
-    "userPoolName": "templatedcf45b08_userpool_dcf45b08",
+    "resourceNameTruncated": "templa5978d173",
+    "userPoolName": "template5978d173_userpool_5978d173",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -31,10 +31,10 @@
     "userpoolClientReadAttributes": [
         "email"
     ],
-    "userpoolClientLambdaRole": "templadcf45b08_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "templa5978d173_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "dcf45b08",
-    "resourceName": "templatedcf45b08",
+    "sharedId": "5978d173",
+    "resourceName": "template5978d173",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [
@@ -50,15 +50,15 @@
     },
     "useDefault": "defaultSocial",
     "hostedUI": true,
-    "hostedUIDomainName": "templatedcf45b08-dcf45b08",
+    "hostedUIDomainName": "template",
     "authProvidersUserPool": [
         "Facebook",
         "Google"
     ],
     "hostedUIProviderMeta": "[{\"ProviderName\":\"Facebook\",\"authorize_scopes\":\"email,public_profile\",\"AttributeMapping\":{\"email\":\"email\",\"username\":\"id\"}},{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"username\":\"sub\"}}]",
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\"],\"LogoutURLs\":[\"http://localhost:3000/\"]}",
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "dependsOn": [],
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\",\"https://main.dhaelg7ke8vdy.amplifyapp.com/\"],\"LogoutURLs\":[\"http://localhost:3000/\",\"https://main.dhaelg7ke8vdy.amplifyapp.com/\"]}"
+    "dependsOn": []
 }

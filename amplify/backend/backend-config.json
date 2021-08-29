@@ -1,12 +1,30 @@
 {
+  "api": {
+    "templateapi": {
+      "service": "AppSync",
+      "providerPlugin": "awscloudformation",
+      "output": {
+        "authConfig": {
+          "defaultAuthentication": {
+            "authenticationType": "API_KEY",
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 7,
+              "description": "templateapikey"
+            }
+          },
+          "additionalAuthenticationProviders": []
+        }
+      }
+    }
+  },
   "auth": {
-    "templatedcf45b08": {
+    "template5978d173": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
       "customAuth": false,
       "frontendAuthConfig": {
-        "loginMechanism": [
+        "loginMechanisms": [
           "EMAIL"
         ],
         "signupAttributes": [
@@ -22,6 +40,5 @@
         ]
       }
     }
-  },
-  "api": {}
+  }
 }
