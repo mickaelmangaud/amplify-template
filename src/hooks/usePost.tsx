@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { API, graphqlOperation } from 'aws-amplify';
 import { GraphQLResult, GRAPHQL_AUTH_MODE } from '@aws-amplify/api';
-import { listPosts, getPost } from '../graphql/queries';
-import { deletePost, updatePost, createPost } from '../graphql/mutations';
 import { compareDesc } from 'date-fns';
+import { API } from 'aws-amplify';
+import * as queries from '../graphql/queries';
+import * as mutations from '../graphql/mutations';
 
 import {
   Post,
@@ -22,9 +22,9 @@ export function usePost() {
 
   useEffect(() => {
     async function getPosts() {
-      const { data } = await (API.graphql(
-        graphqlOperation(listPosts)
-      ) as Promise<GraphQLResult<ListPostsQuery>>);
+      const { data } = await (API.graphql({ query: queries.listPosts }) as Promise<
+        GraphQLResult<ListPostsQuery>
+      >);
 
       data.listPosts.items.sort((a, b) =>
         compareDesc(new Date(a.createdAt), new Date(b.createdAt))
@@ -38,7 +38,7 @@ export function usePost() {
   async function createNewPost(Post: CreatePostInput) {
     try {
       const { data } = await (API.graphql({
-        query: createPost,
+        query: mutations.createPost,
         variables: { input: Post },
         authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
       }) as Promise<GraphQLResult<CreatePostMutation>>);
@@ -51,7 +51,7 @@ export function usePost() {
 
   async function getPostById(id: string) {
     const { data } = await (API.graphql({
-      query: getPost,
+      query: queries.getPost,
       variables: { id },
       authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
     }) as Promise<GraphQLResult<GetPostQuery>>);
@@ -66,14 +66,12 @@ export function usePost() {
   async function updatePostById(input: UpdatePostInput) {
     try {
       const { data } = await (API.graphql({
-        query: updatePost,
+        query: mutations.updatePost,
         variables: { input },
         authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
       }) as Promise<GraphQLResult<UpdatePostMutation>>);
 
-      setPosts(Posts =>
-        posts.map(t => (t.id === data.updatePost.id ? data.updatePost : t))
-      );
+      setPosts(Posts => posts.map(t => (t.id === data.updatePost.id ? data.updatePost : t)));
     } catch (e) {
       console.log(e);
     }
@@ -82,7 +80,7 @@ export function usePost() {
   async function deletePostById(input: DeletePostInput) {
     try {
       await (API.graphql({
-        query: deletePost,
+        query: mutations.deletePost,
         variables: { input },
         authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
       }) as Promise<GraphQLResult<DeletePostMutation>>);
